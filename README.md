@@ -8,6 +8,7 @@ Warning: These files contain a few (114, in a dataset of over 300,000) examples 
 We will need Stanford CoreNLP to tokenize the data. Download it here and unzip it. Then add the following command to your bash_profile:
 
 export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar
+
 replacing /path/to/ with the path to where you saved the stanford-corenlp-full-2016-10-31 directory. You can check if it's working by running
 
 echo "Please tokenize this text." | java edu.stanford.nlp.process.PTBTokenizer
