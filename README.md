@@ -12,14 +12,13 @@ export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.
 replacing /path/to/ with the path to where you saved the stanford-corenlp-full-2016-10-31 directory. You can check if it's working by running
 
 echo "Please tokenize this text." | java edu.stanford.nlp.process.PTBTokenizer
-You should see something like:
 
+You should see something like:
 Please
-tokenize
+toeknize
 this
 text
 .
-
 PTBTokenizer tokenized 5 tokens at 68.97 tokens per second.
 
 ## 3. Process into .bin and vocab files
