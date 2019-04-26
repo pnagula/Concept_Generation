@@ -1,5 +1,5 @@
 # Instructions
-## 1. Preprocessing - Does the following
+## 1. Preprocessing
 * Feedback and Concepts extraction from files into dataframes.
 * Left Join Feedback and Concepts on SNO and pull out all unmatched feedback text used to score.
 * Inner Join Feedback and Concepts on SNO and pill out all matched feedback text using for training
