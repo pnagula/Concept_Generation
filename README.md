@@ -15,7 +15,7 @@ Download and unzip the stories directories from https://cs.nyu.edu/~kcho/DMQA/ f
 Warning: These files contain a few (114, in a dataset of over 300,000) examples for which the article text is missing - see for example cnn/stories/72aba2f58178f2d19d3fae89d5f3e9a4686bc4bb.story. The Tensorflow code has been updated to discard these examples.
 
 ## 3. Download Stanford CoreNLP
-We will need Stanford CoreNLP to tokenize the data. Download it here and unzip it. Then add the following command to your bash_profile:
+We will need Stanford CoreNLP to tokenize the data. Download it from https://stanfordnlp.github.io/CoreNLP/ and unzip it. Then add the following command to your bash_profile:
 
 export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar
 
