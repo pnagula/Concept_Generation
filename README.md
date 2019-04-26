@@ -19,7 +19,9 @@ tokenize
 this
 text
 .
+
 PTBTokenizer tokenized 5 tokens at 68.97 tokens per second.
+
 ## 3. Process into .bin and vocab files
 Run
 
