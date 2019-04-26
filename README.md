@@ -10,7 +10,7 @@
 
 
 ## 2. Download cnn-dailymail stories data
-Download and unzip the stories directories from here for both CNN and Daily Mail.
+Download and unzip the stories directories from https://cs.nyu.edu/~kcho/DMQA/ for both CNN and Daily Mail.
 
 Warning: These files contain a few (114, in a dataset of over 300,000) examples for which the article text is missing - see for example cnn/stories/72aba2f58178f2d19d3fae89d5f3e9a4686bc4bb.story. The Tensorflow code has been updated to discard these examples.
 
