@@ -1,6 +1,6 @@
 # Concept Generation Process Flow
 
-![alt text](https://github.com/pnagula/Concept_Generation/blob/master/Concept%20Generation.jpeg)
+![alt text](https://github.com/pnagula/Concept_Generation/blob/master/Concept%20Generation%20(1).jpeg)
 
 # Instructions
 ## 1. Preprocessing
