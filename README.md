@@ -1,3 +1,5 @@
+![alt text](https://github.com/pnagula/Concept_Generation/blob/master/Concept%20Generation.jpeg)
+
 # Instructions
 ## 1. Preprocessing
 * Feedback and Concepts extraction from files into dataframes.
