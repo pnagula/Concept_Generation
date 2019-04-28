@@ -6,10 +6,10 @@
 ## 1. Preprocessing
 * Feedback and Concepts extraction from files into dataframes.
 * Left Join Feedback and Concepts on SNO and pull out all unmatched feedback text used to score.
-* Inner Join Feedback and Concepts on SNO and pill out all matched feedback text using for training
-* Convert feedback text to vector using Gensim Doc2vec and cluster the unmatched feedback text under each label/issue, each   label/issue will have 0 to K clusters. A concept is generated from cluster.
+* Inner Join Feedback and Concepts on SNO and pull out all matched feedback text using for training
+* Extract sentiment from feedback text and convert feedback text to 300 dimensional vectors using Gensim Doc2vec and cluster the unmatched feedback text under each label/issue, each label/issue will have 0 to K clusters. A concept is generated from cluster.
 * Gensim Extractive summarization on the cluster to make the feedback text to 400 words.
-* Aguments private data with publicly available cnn-dailymail stories dataset.
+* Aguments private data with publicly available cnn-dailymail stories dataset to address shortage of data for training deep learning model.
 * Create .story file for each cluster of each label so that these files can be fed to cnn-dailymail story file processor.
 
 
