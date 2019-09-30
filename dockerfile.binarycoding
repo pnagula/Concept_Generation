@@ -1,0 +1,3 @@
+FROM concept_gen_base:latest
+WORKDIR /home/pnagula/
+CMD python ./files/Code/Binarycoding.py '/home/pnagula' > ./files/logs/binarycoding.log

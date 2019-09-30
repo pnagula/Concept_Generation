@@ -1,0 +1,4 @@
+FROM concept_gen_base:latest
+WORKDIR /home/pnagula/
+ENV CLASSPATH=./files/static_data/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar
+CMD python ./files/Code/make_datafiles.py ./files/output_files/cnn/stories/ ./files/output_files/dailymail/stories/ 'D' 'training' '/home/pnagula' > ./files/logs/makedatafiles_training.log

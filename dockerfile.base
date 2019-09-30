@@ -1,0 +1,61 @@
+# take tensorflow gpu as base image as it covers nvidia cuda toolkit and centos images
+FROM tensorflow/tensorflow:latest-gpu
+
+# make debian silent to accept licenses
+ARG DEBIAN_FRONTEND=noninteractive
+
+# auto select true for oracle java license v1-2 
+RUN echo debconf shared/accepted-oracle-license-v1-2 select true |  debconf-set-selections
+
+# create a directory to hold Java 11 JDK
+RUN mkdir -p /var/cache/oracle-jdk11-installer-local/
+
+# copy Java 11 JDK from local file system to container file system 
+COPY ./jdk-11.0.4_linux-x64_bin.tar.gz /var/cache/oracle-jdk11-installer-local/
+
+# set working directory
+WORKDIR /home/pnagula/
+
+
+# copy environment.yml file to working directory of container 
+COPY ./environment.yml ./
+
+# set environment variables
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+ENV PATH /opt/conda/bin:$PATH
+
+# install dependencies for miniconda
+RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
+    libglib2.0-0 libxext6 libsm6 libxrender1 \
+    git mercurial subversion
+
+# install miniconda and all packages mentioned in environment.yml file, create py368 conda environment and activate it
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    /opt/conda/bin/conda clean -tipsy && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    conda env create -f environment.yml && \
+    echo "source activate py368" > ~/.bashrc
+
+# install Java 11 on image
+RUN apt purge oracle-java11-installer && \
+    add-apt-repository ppa:linuxuprising/java && \
+    apt-get update && \
+    apt -y install oracle-java11-installer-local && \
+    apt -y install oracle-java11-set-default-local
+
+# add conda environment to PATH
+ENV PATH /opt/conda/envs/py368/bin:$PATH
+
+# download spacy english modules 
+RUN python -m spacy download en_vectors_web_lg
+
+# install fastText
+#RUN git clone https://github.com/facebookresearch/fastText.git && \
+#    cd fastText && \
+#    pip install .
+#    install pattern
+COPY ./pattern/ ./
+RUN    python setup.py install

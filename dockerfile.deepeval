@@ -1,0 +1,3 @@
+FROM concept_gen_base:latest
+WORKDIR /home/pnagula/
+CMD python ./files/Code/run_summarization.py --mode=eval --data_path=./files/output_files/finished_files/chunked/val_* --vocab_path=./files/output_files/finished_files/vocab --log_root=./files/pglogs/ --exp_name=firstpgexp_400 --max_enc_steps=400 --emb_dim=300 --vocab_size=90000 --single_pass=true > ./files/logs/plog_val.log
