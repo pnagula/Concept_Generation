@@ -1,3 +1,3 @@
 FROM concept_gen_base:latest
 WORKDIR /home/pnagula/
-CMD python ./files/Code/Preprocessing_PointerGenerator.py '/home/pnagula' 'training' > ./files/logs/preprocessing_training.log
+CMD python ./files/Code/Preprocessing.py '/home/pnagula' 'training' > ./files/logs/preprocessing_training.log
