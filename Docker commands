@@ -1,0 +1,18 @@
+-- Docker run commands
+docker run -it -v firstvol:/home/pnagula/ concept_gen_preprocessingscoring:latest
+docker run -it --runtime nvidia -v firstvol:/home/pnagula/ concept_gen_makedatafilesscoring:latest
+rm -rf $DOCKPTH/pglogs/firstpgexp_400/decode_test_400maxenc_4beam_35mindec_100maxdec_ckpt-153886 
+docker run -it --runtime nvidia -v firstvol:/home/pnagula/ concept_gen_deepdecode:latest
+docker run -it -v firstvol:/home/pnagula/ concept_gen_postprocessing:latest
+docker run -it -v firstvol:/home/pnagula/ concept_gen_binarycoding:latest
+
+-- Docker Build commands
+docker build -t concept_gen_preprocessingtraining:latest -f dockerfile.preprocessingtraining .
+docker build -t concept_gen_preprocessingscoring:latest -f dockerfile.preprocessingscoring .
+docker build -t concept_gen_makedatafilestraining:latest -f dockerfile.makedatafilestraining .
+docker build -t concept_gen_makedatafilesscoring:latest -f dockerfile.makedatafilesscoring .
+docker build -t concept_gen_deeptrain:latest -f dockerfile.deeptrain .
+docker build -t concept_gen_deepeval:latest -f dockerfile.deepeval .
+docker build -t concept_gen_deepdecode:latest -f dockerfile.deepdecode .
+docker build -t concept_gen_postprocessing:latest -f dockerfile.postprocessing .
+docker build -t concept_gen_binarycoding:latest -f dockerfile.binarycoding .
