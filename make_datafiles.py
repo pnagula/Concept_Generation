@@ -5,7 +5,7 @@ import struct
 import subprocess
 import collections
 import shutil
-#import tensorflow as tf
+import tensorflow as tf
 from tensorflow.core.example import example_pb2
 from gensim.summarization.summarizer import summarize
 import glob
@@ -18,13 +18,13 @@ END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_dou
 SENTENCE_START = '<s>'
 SENTENCE_END = '</s>'
 
-all_train_urls = "url_lists/all_train_copy.txt"
-all_val_urls = "url_lists/all_val_copy.txt"
-all_test_urls = "url_lists/all_test_copy.txt"
+all_train_urls = "files/output_files/url_lists/all_train_copy.txt"
+all_val_urls = "files/output_files/url_lists/all_val_copy.txt"
+all_test_urls = "files/output_files/url_lists/all_test_copy.txt"
 
-cnn_tokenized_stories_dir = "cnn_stories_tokenized"
-dm_tokenized_stories_dir = "dm_stories_tokenized"
-finished_files_dir = "finished_files"
+cnn_tokenized_stories_dir = "files/output_files/cnn_stories_tokenized"
+dm_tokenized_stories_dir = "files/output_files/dm_stories_tokenized"
+finished_files_dir = "files/output_files/finished_files"
 chunks_dir = os.path.join(finished_files_dir, "chunked")
 
 # These are the number of .story files we expect there to be in cnn_stories_dir and dm_stories_dir
@@ -37,7 +37,7 @@ CHUNK_SIZE = 1000 # num examples per chunk, for the chunked data
 
 
 def chunk_file(set_name):
-  in_file = 'finished_files/%s.bin' % set_name
+  in_file = 'files/output_files/finished_files/%s.bin' % set_name
   reader = open(in_file, "rb")
   chunk = 0
   finished = False
@@ -61,11 +61,14 @@ def chunk_all():
   if not os.path.isdir(chunks_dir):
     os.mkdir(chunks_dir)
   # Chunk the data
-  for set_name in ['train', 'val', 'test']:
-    print("Splitting %s data into chunks..." % set_name)
-    chunk_file(set_name)
-  print("Saved chunked data in %s" % chunks_dir)
-
+  if sys.argv[4]=='training':
+     set_name = ['train', 'val']
+  else:
+     set_name = ['test']
+  for name in set_name:
+      print("Splitting %s data into chunks..." % name)
+      chunk_file(name)
+      print("Saved chunked data in %s" % chunks_dir)
 
 def tokenize_stories(stories_dir, tokenized_stories_dir):
   """Maps a whole directory of .story files to a tokenized version using Stanford CoreNLP Tokenizer"""
@@ -75,12 +78,14 @@ def tokenize_stories(stories_dir, tokenized_stories_dir):
   print("Making list of files to tokenize...")
   with open("mapping.txt", "w") as f:
     for s in stories:
-        f.write("%s \t %s\n" % (os.path.join(stories_dir, s), os.path.join(tokenized_stories_dir, s)))
-  command = ['java', 'edu.stanford.nlp.process.PTBTokenizer', '-ioFileList', '-preserveLines', 'mapping.txt']
-  print("Tokenizing %i files in %s and saving in %s..." % (len(stories), stories_dir, tokenized_stories_dir))
-  subprocess.call(command)
-  print("Stanford CoreNLP Tokenizer has finished.")
-  os.remove("mapping.txt")
+       #print(os.path.join(stories_dir, s)) 
+       f.write("%s \t %s\n" % (os.path.join(stories_dir, s), os.path.join(tokenized_stories_dir, s)))
+  if len(stories) > 0:     
+     command = ['java', 'edu.stanford.nlp.process.PTBTokenizer', '-ioFileList', '-preserveLines', 'mapping.txt']
+     print("Tokenizing %i files in %s and saving in %s..." % (len(stories), stories_dir, tokenized_stories_dir))
+     subprocess.call(command)
+     print("Stanford CoreNLP Tokenizer has finished.")
+     os.remove("mapping.txt")
 
   # Check that the tokenized stories directory contains the same number of files as the original directory
   num_orig = len(os.listdir(stories_dir))
@@ -117,13 +122,18 @@ def fix_missing_period(line):
   if line[-1] in END_TOKENS: return line
   return line + " ."
 
-#omit_list=['''''','``','-rrb-','-lrb-','--','-','...']
-def get_art_abs(story_file,summ):
+omit_list=['''''','``','-rrb-','-lrb-','--','...']
+def get_art_abs(story_file):
   lines = read_text_file(story_file)
 
   # Lowercase everything
   lines = [line.lower() for line in lines]
-
+  
+  index=0
+  while index < len(lines):
+      for tok in omit_list:
+          lines[index]=lines[index].replace(tok,'')
+      index+=1
   # Put periods on the ends of lines that are missing them (this is a problem in the dataset because many image captions don't end in periods; consequently they end up in the body of the article as run-on sentences)
   lines = [fix_missing_period(line) for line in lines]
 
@@ -143,14 +153,14 @@ def get_art_abs(story_file,summ):
 
   # Make article into a single string
   article = ' '.join(article_lines)
-
+  abstract = ' '.join(["%s %s %s" % (SENTENCE_START, sent, SENTENCE_END) for sent in highlights])
 # Make abstract into a signle string, putting <s> and </s> tags around the sentences
-  if not summ:
-     abstract = ' '.join(["%s %s %s" % (SENTENCE_START, sent, SENTENCE_END) for sent in highlights])
-  else:
-     abstract = '. '.join(highlights)
+#  if not summ:
+#     abstract = ' '.join(["%s %s %s" % (SENTENCE_START, sent, SENTENCE_END) for sent in highlights])
+#  else:
+#  abstract = '. '.join(highlights)
      
-  return article, abstract, len(article_lines), len(highlights)
+  return article, abstract
 
 
 def write_to_bin(url_file, out_file, makevocab=False):
@@ -183,7 +193,7 @@ def write_to_bin(url_file, out_file, makevocab=False):
         raise Exception("Tokenized stories directories %s and %s contain correct number of files but story file %s found in neither." % (cnn_tokenized_stories_dir, dm_tokenized_stories_dir, s))
 
       # Get the strings to write to .bin file
-      article, abstract, _, _ = get_art_abs(story_file,False)
+      article, abstract = get_art_abs(story_file)
 
       # Write to tf.Example
       tf_example = example_pb2.Example()
@@ -222,14 +232,14 @@ def check_num_stories(stories_dir, num_expected):
 
 
 if __name__ == '__main__':
-#  if len(sys.argv) != 4:
-#     print("USAGE: python make_datafiles.py <cnn_stories_dir> <dailymail_stories_dir> <K/D>")
-#     sys.exit()
-  cnn_stories_dir = '/users/pivotalit/downloads/cnn/stories'
-  dm_stories_dir = '/users/pivotalit/downloads/dailymail/stories'
+  if len(sys.argv) != 5:
+     print("USAGE: python make_datafiles.py <cnn_stories_dir> <dailymail_stories_dir> <K/D>")
+     sys.exit()
+  cnn_stories_dir = sys.argv[1]
+  dm_stories_dir = sys.argv[2]
   num_expected_cnn_stories = len(os.listdir(cnn_stories_dir))
   num_expected_dm_stories = len(os.listdir(dm_stories_dir))
-
+  
   # Check the stories directories contain the correct number of .story files
   check_num_stories(cnn_stories_dir, num_expected_cnn_stories)
   check_num_stories(dm_stories_dir, num_expected_dm_stories)
@@ -248,12 +258,17 @@ if __name__ == '__main__':
   # Run stanford tokenizer on both stories dirs, outputting to tokenized stories directories
   if sys.argv[3]=='D':
      tokenize_stories(cnn_stories_dir, cnn_tokenized_stories_dir)  
-     tokenize_stories(dm_stories_dir, dm_tokenized_stories_dir)
+     if sys.argv[4]=='training':
+        tokenize_stories(dm_stories_dir, dm_tokenized_stories_dir)
 
   # Read the tokenized stories, do a little postprocessing then write to bin files
-  write_to_bin(all_test_urls, os.path.join(finished_files_dir, "test.bin"))
-  write_to_bin(all_val_urls, os.path.join(finished_files_dir, "val.bin"))
-  write_to_bin(all_train_urls, os.path.join(finished_files_dir, "train.bin"), makevocab=True)
+  if sys.argv[4]=='training': 
+     write_to_bin(all_val_urls, os.path.join(finished_files_dir, "val.bin"))
+     write_to_bin(all_train_urls, os.path.join(finished_files_dir, "train.bin"), makevocab=True)
+     shutil.copyfile(os.path.join(finished_files_dir, "vocab"),'/home/pnagula/files/static_data/vocab')
+  else:
+     write_to_bin(all_test_urls, os.path.join(finished_files_dir, "test.bin"))
+     shutil.copyfile('/home/pnagula/files/static_data/vocab',os.path.join(finished_files_dir, "vocab"))
 
   # Chunk the data. This splits each of train.bin, val.bin and test.bin into smaller chunks, each containing e.g. 1000 examples, and saves them in finished_files/chunks
   chunk_all()
