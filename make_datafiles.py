@@ -265,10 +265,10 @@ if __name__ == '__main__':
   if sys.argv[4]=='training': 
      write_to_bin(all_val_urls, os.path.join(finished_files_dir, "val.bin"))
      write_to_bin(all_train_urls, os.path.join(finished_files_dir, "train.bin"), makevocab=True)
-     shutil.copyfile(os.path.join(finished_files_dir, "vocab"),'/home/pnagula/files/static_data/vocab')
+     shutil.copyfile(os.path.join(finished_files_dir, "vocab"),sys.argv[5]+'/files/static_data/vocab')
   else:
      write_to_bin(all_test_urls, os.path.join(finished_files_dir, "test.bin"))
-     shutil.copyfile('/home/pnagula/files/static_data/vocab',os.path.join(finished_files_dir, "vocab"))
+     shutil.copyfile(sys.argv[5]+'/files/static_data/vocab',os.path.join(finished_files_dir, "vocab"))
 
   # Chunk the data. This splits each of train.bin, val.bin and test.bin into smaller chunks, each containing e.g. 1000 examples, and saves them in finished_files/chunks
   chunk_all()
